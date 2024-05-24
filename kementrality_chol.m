@@ -70,10 +70,12 @@ else
 end
 fprintf('Started centrality computation...\n')
 tic
+checkpoints = unique(floor(linspace(1,m,20)));
+fprintf('Each character # is printed when 1/%d of the computation is done:\n',length(checkpoints));
 parfor (k = 1:m, maxWorkers)
 %for k = 1:m  % one may want to switch to a non-parallel for for profiling
-    if mod(k, 1000) == 0
-        fprintf('Run iteration %d / %d...\n', k, m);
+    if ismember(k, checkpoints)
+        fprintf('#\n');
     end
     ij_slice = ij(:,k);
     i = ij_slice(1);
