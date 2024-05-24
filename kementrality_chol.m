@@ -70,8 +70,8 @@ else
 end
 fprintf('Started centrality computation...\n')
 tic
-checkpoints = unique(floor(linspace(1,m,20)));
-fprintf('Each character # is printed when 1/%d of the computation is done:\n',length(checkpoints));
+checkpoints = unique(floor(linspace(1,m,50)));
+fprintf('Each character # is printed when approximately 1/%d of the computation is completed:\n',length(checkpoints));
 parfor (k = 1:m, maxWorkers)
 %for k = 1:m  % one may want to switch to a non-parallel for for profiling
     if ismember(k, checkpoints)
