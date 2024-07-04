@@ -1,4 +1,4 @@
-function G = kementrality(basename, reg, weights, parallel)
+function G = kementrality(basename, reg, weights, filtered, parallel)
 % compute kemeny-based centrality from a csv file
 %
 % G = kementrality(basename, reg, weights, parallel)
@@ -33,13 +33,14 @@ function G = kementrality(basename, reg, weights, parallel)
 %     to 10^(-8).
 %   * weights: weight to use for each edge; defaults to 
 %     exp(edge_length/max_length), as used in the paper
+%   * filtered: wheter to apply filtering; defaults to true.
 %   * parallel: whether to use parallel computation. You may set it to false
 %     if you don't have the Matlab parallel toolbox installed, or if you want
 %     a faster result for a small network. Otherwise just use the default
 %     true.
 %   
 % To set parallel to false without touching the other defaults, use
-% >> G = kementrality("map", [], [], false);
+% >> G = kementrality("map", [], [], [], false);
 %
 % Return value: a Matlab graph object, which includes G.Edges.kementrality.
 %
@@ -53,6 +54,10 @@ end
 if not(exist('parallel', 'var')) || isempty(parallel)
     parallel = true;
 end
+if not(exist('filtered', 'var')) || isempty(filtered)
+    filtered = true;
+end
+
 
 G = convert_graphs(basename, true);
 
@@ -62,6 +67,11 @@ if not(exist('weights', 'var')) || isempty(weights)
 end
 
 [kementrality, ~] = kementrality_chol(G, reg, weights, parallel);
+
+if filtered
+    kementrality(kementrality > 0.5/reg) = 1/reg - kementrality(kementrality > 0.5/reg);
+end
+
 G.Edges.kementrality = kementrality;
 % sets up things 
 
@@ -78,3 +88,14 @@ T1 = readtable(strcat(basename, '.csv'));
 T1 = outerjoin(T1, T2, 'Type', 'left', 'MergeKeys', true);
 
 writetable(T1, strcat(basename, '_kementrality.csv'));
+
+rescale = (kementrality - min(kementrality));
+rescale = rescale / max(rescale);
+rescale = 0.01 + 0.99 * rescale;
+rescale = log(rescale);
+
+% "reverse parula" seems the colormap that works better visually
+cmap = colormap('parula');
+colormap(cmap(end:-1:1,:));
+plot(G, "EdgeCData", rescale, "XData", G.Nodes.x, "YData", G.Nodes.y, 'Marker', 'none');
+colorbar;
