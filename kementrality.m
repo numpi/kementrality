@@ -1,7 +1,7 @@
 function G = kementrality(basename, reg, weights, filtered, parallel)
 % compute kemeny-based centrality from a csv file
 %
-% G = kementrality(basename, reg, weights, parallel)
+% G = kementrality(basename, reg, weights, filtered, parallel)
 %
 % Compute the Kemeny-based centrality described in 
 % https://doi.org/10.1137/22M1486728
