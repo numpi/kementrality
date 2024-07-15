@@ -17,11 +17,12 @@ function G = kementrality(basename, reg, weights, filtered, parallel)
 % a file called "map_kementrality.csv". 
 %
 % A point is considered an intersection only if (x1,y1) or (x2,y2) match 
-% exactly those in another line. Take care with approximations, e.g.,
-% one coordinate being 1.5 on a line and 1.49999999 on another.
+% exactly those in another road segment. Take care with approximations, e.g.,
+% one coordinate being 1.5 on a segment and 1.49999999 on another.
 %
 % If the network is disconnected, the centrality is computed only on the
-% largest connected component; disconnected roads are ignored.
+% largest connected component; ; on disconnected roads the column contains
+% NaN.
 %
 % Additional columns in map.csv are copied to this new file, and a column
 % called kementrality is added.

@@ -1,7 +1,7 @@
 function G = kementrality_der(basename, reg, weights, relative, parallel)
 % compute the derivative variant of the kemeny-based centrality from a csv file
 %
-% G = kementrality(basename, reg, weights, relative, parallel)
+% G = kementrality_der(basename, reg, weights, relative, parallel)
 %
 % Compute the Kemeny-based centrality described in 
 % https://doi.org/10.1137/22M1486728
@@ -10,18 +10,25 @@ function G = kementrality_der(basename, reg, weights, relative, parallel)
 %
 % Usage:
 %
-% >> G = kementrality("map")
+% >> G = kementrality_der("map")
 %
-% reads the network from a file called "map.csv", which must contain one 
-% line for each edge, with columns x1, y1, x2, y2, and writes the result on 
+% or:
+%
+% >> G = kementrality_der("map", [], [], false)
+%
+% (the second form does not scale the measure by edge weight)
+%
+% The command reads the network from a file called "map.csv", which must contain one 
+% line for each edge with columns x1, y1, x2, y2, and writes the result on 
 % a file called "map_kementrality.csv". 
 %
 % A point is considered an intersection only if (x1,y1) or (x2,y2) match 
-% exactly those in another line. Take care with approximations, e.g.,
-% one coordinate being 1.5 on a line and 1.49999999 on another.
+% exactly those in another road segment. Take care with approximations, e.g.,
+% one coordinate being 1.5 on a segment and 1.49999999 on another.
 %
 % If the network is disconnected, the centrality is computed only on the
-% largest connected component; disconnected roads are ignored.
+% largest connected component; on disconnected roads the column contains 
+% NaN.
 %
 % Additional columns in map.csv are copied to this new file, and a column
 % called kementrality is added.
