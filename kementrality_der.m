@@ -73,7 +73,7 @@ if not(exist('weights', 'var')) || isempty(weights)
     weights = exp(-G.Edges.Length/max(G.Edges.Length));
 end
 
-[kementrality_der, ~] = kementrality_chol_der(G, reg, weights, parallel, relative);
+kementrality_der = kementrality_chol_der(G, reg, weights, parallel, relative);
 
 G.Edges.kementrality_der = kementrality_der;
 % sets up things 

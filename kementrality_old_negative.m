@@ -1,10 +1,11 @@
-function G = kementrality(basename, reg, weights, filtered, parallel)
+function G = kementrality_old_negative(basename, weights, parallel)
 % compute kemeny-based centrality from a csv file
 %
-% G = kementrality(basename, reg, weights, filtered, parallel)
+% G = kementrality(basename, weights, parallel)
 %
-% Compute the Kemeny-based centrality described in 
-% https://doi.org/10.1137/22M1486728
+% Compute the old version of the Kemeny-based centrality used in 
+% https://www.hvl.no/globalassets/hvl-internett/arrangement/2022/13sss/522altafini.pdf. 
+% Note that this measure can take negative values.
 %
 % This is a single unified script meant to simplify the process.
 %
@@ -49,16 +50,9 @@ function G = kementrality(basename, reg, weights, filtered, parallel)
 %
 % >> plot(G, "XData", G.Nodes.x, "YData", G.Nodes.y, "EdgeCData", G.Edges.kementrality);
 
-if not(exist('reg', 'var')) || isempty(reg)
-    reg = 1e-8;
-end
 if not(exist('parallel', 'var')) || isempty(parallel)
     parallel = true;
 end
-if not(exist('filtered', 'var')) || isempty(filtered)
-    filtered = true;
-end
-
 
 G = convert_graphs(basename, true);
 
@@ -67,11 +61,7 @@ if not(exist('weights', 'var')) || isempty(weights)
     weights = exp(-G.Edges.Length/max(G.Edges.Length));
 end
 
-kementrality = kementrality_chol(G, reg, weights, parallel);
-
-if filtered
-    kementrality(kementrality > 0.5/reg) = 1/reg - kementrality(kementrality > 0.5/reg);
-end
+kementrality = kementrality_old_negative_ldl(G, weights, parallel);
 
 G.Edges.kementrality = kementrality;
 % sets up things 
