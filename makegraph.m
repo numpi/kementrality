@@ -56,4 +56,8 @@ G.Edges.switched = (G.Edges.id1 ~= G.Edges.EndNodes(:,1));
 G.Edges.id1 = [];
 G.Edges.id2 = [];
 
+% We delete id as well, since we won't need it and it may cause confusion
+% as it is almost a copy of the node number
+G.Nodes.id = [];
+
 G = simplify(G, 'first', 'omitselfloops');
