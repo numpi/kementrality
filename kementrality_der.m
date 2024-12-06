@@ -69,31 +69,34 @@ end
 
 if isa(basename, "char")
     G = convert_graphs(basename, true);
+else
+    G = basename;
 end
 
 if not(exist('weights', 'var')) || isempty(weights)
-    G.Edges.Length = hypot(G.Edges.x1-G.Edges.x2, G.Edges.y1-G.Edges.y2);
+    G.Edges.Length = hypot(diff(G.Nodes.x(G.Edges.EndNodes),[],2), diff(G.Nodes.y(G.Edges.EndNodes),[],2));
     weights = exp(-G.Edges.Length/max(G.Edges.Length));
 end
 
 kementrality_der = kementrality_chol_der(G, reg, weights, parallel, relative);
 
 G.Edges.kementrality_der = kementrality_der;
-% sets up things 
 
-% creates a reduced Edges table that undoes the switching
-x1 = G.Edges.x1;
-x2 = G.Edges.x2;
-y1 = G.Edges.y1;
-y2 = G.Edges.y2;
-[x1(G.Edges.switched), x2(G.Edges.switched)] = deal(x2(G.Edges.switched), x1(G.Edges.switched));
-[y1(G.Edges.switched), y2(G.Edges.switched)] = deal(y2(G.Edges.switched), y1(G.Edges.switched));
-T2 = table(x1, y1, x2, y2, kementrality_der);
+if isa(basename, 'char')
+    % creates a reduced Edges table that undoes the switching in
+    % convert_graphs
+    x1 = G.Edges.x1;
+    x2 = G.Edges.x2;
+    y1 = G.Edges.y1;
+    y2 = G.Edges.y2;
+    [x1(G.Edges.switched), x2(G.Edges.switched)] = deal(x2(G.Edges.switched), x1(G.Edges.switched));
+    [y1(G.Edges.switched), y2(G.Edges.switched)] = deal(y2(G.Edges.switched), y1(G.Edges.switched));
+    T2 = table(x1, y1, x2, y2, kementrality_der);
 
-T1 = readtable(strcat(basename, '.csv'));
-T1 = outerjoin(T1, T2, 'Type', 'left', 'MergeKeys', true);
-
-writetable(T1, strcat(basename, '_kementrality_der.csv'));
+    T1 = readtable(strcat(basename, '.csv'));
+    T1 = outerjoin(T1, T2, 'Type', 'left', 'MergeKeys', true);
+    writetable(T1, strcat(basename, '_kementrality_der.csv'));
+end
 
 rescale = (kementrality_der - min(kementrality_der));
 rescale = rescale / max(rescale);
