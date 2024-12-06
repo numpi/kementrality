@@ -35,6 +35,8 @@ function G = kementrality_der(basename, reg, weights, relative, parallel)
 % Auxiliary files map_nodes.csv, map_edges.csv, and map_dual_edges.csv are
 % produced.
 %
+% Alternatively, the first argument can be a Matlab graph object.
+%
 % Additional parameters:
 %   * reg: regularization parameter as described in the paper; defaults 
 %     to 10^(-8).
@@ -65,8 +67,9 @@ if not(exist('relative', 'var')) || isempty(relative)
     relative = true;
 end
 
-
-G = convert_graphs(basename, true);
+if isa(basename, "char")
+    G = convert_graphs(basename, true);
+end
 
 if not(exist('weights', 'var')) || isempty(weights)
     G.Edges.Length = hypot(G.Edges.x1-G.Edges.x2, G.Edges.y1-G.Edges.y2);
