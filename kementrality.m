@@ -61,7 +61,7 @@ if not(exist('filtered', 'var')) || isempty(filtered)
     filtered = true;
 end
 
-if isa(basename, "char")
+if isa(basename, "string")
     G = convert_graphs(basename, true);
 else
     G = basename;
@@ -80,7 +80,7 @@ end
 
 G.Edges.kementrality = kementrality;
 
-if isa(basename,'char')
+if isa(basename, "string")
     % creates a reduced Edges table that undoes the switching in
     % convert_graphs
     x1 = G.Edges.x1;

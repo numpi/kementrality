@@ -56,7 +56,7 @@ if not(exist('parallel', 'var')) || isempty(parallel)
     parallel = true;
 end
 
-if isa(basename, "char")
+if isa(basename, "string")
     G = convert_graphs(basename, true);
 else
     G = basename;
@@ -71,7 +71,7 @@ kementrality = kementrality_old_negative_ldl(G, weights, parallel);
 
 G.Edges.kementrality = kementrality;
 
-if isa(basename, 'char')
+if isa(basename, "string")
     % creates a reduced Edges table that undoes the switching in
     % convert_graphs
     x1 = G.Edges.x1;

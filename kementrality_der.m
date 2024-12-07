@@ -67,7 +67,7 @@ if not(exist('relative', 'var')) || isempty(relative)
     relative = true;
 end
 
-if isa(basename, "char")
+if isa(basename, "string")
     G = convert_graphs(basename, true);
 else
     G = basename;
@@ -82,7 +82,7 @@ kementrality_der = kementrality_chol_der(G, reg, weights, parallel, relative);
 
 G.Edges.kementrality_der = kementrality_der;
 
-if isa(basename, 'char')
+if isa(basename, "string")
     % creates a reduced Edges table that undoes the switching in
     % convert_graphs
     x1 = G.Edges.x1;
