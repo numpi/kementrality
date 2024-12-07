@@ -98,13 +98,4 @@ if isa(basename, 'char')
     writetable(T1, strcat(basename, '_kementrality_der.csv'));
 end
 
-rescale = (kementrality_der - min(kementrality_der));
-rescale = rescale / max(rescale);
-rescale = 0.01 + 0.99 * rescale;
-rescale = log(rescale);
-
-% "reverse parula" seems the colormap that works better visually
-cmap = colormap('parula');
-colormap(cmap(end:-1:1,:));
-plot(G, "EdgeCData", rescale, "XData", G.Nodes.x, "YData", G.Nodes.y, 'Marker', 'none');
-colorbar;
+plotmeasure(G, kementrality_der);
