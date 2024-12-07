@@ -74,7 +74,7 @@ else
 end
 
 if not(exist('weights', 'var')) || isempty(weights)
-    G.Edges.Length = hypot(diff(G.Nodes.x(G.Edges.EndNodes),[],2), diff(G.Nodes.y(G.Edges.EndNodes),[],2));
+    G.Edges.Length = hypot(diff(G.Nodes.x(G.Edges.EndNodes)'), diff(G.Nodes.y(G.Edges.EndNodes)'))';
     weights = exp(-G.Edges.Length/max(G.Edges.Length));
 end
 
