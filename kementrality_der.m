@@ -67,10 +67,14 @@ if not(exist('relative', 'var')) || isempty(relative)
     relative = true;
 end
 
-if isa(basename, "string")
+if isa(basename, "char")
     G = convert_graphs(basename, true);
 else
     G = basename;
+end
+if exist('weights', 'var') && strcmp(weights, 'inv')
+    G.Edges.Length = hypot(diff(G.Nodes.x(G.Edges.EndNodes)'), diff(G.Nodes.y(G.Edges.EndNodes)'))';
+    weights = 1 ./ G.Edges.Length;
 end
 
 if not(exist('weights', 'var')) || isempty(weights)
@@ -78,11 +82,12 @@ if not(exist('weights', 'var')) || isempty(weights)
     weights = exp(-G.Edges.Length/max(G.Edges.Length));
 end
 
+
 kementrality_der = kementrality_chol_der(G, reg, weights, parallel, relative);
 
 G.Edges.kementrality_der = kementrality_der;
 
-if isa(basename, "string")
+if isa(basename, "char")
     % creates a reduced Edges table that undoes the switching in
     % convert_graphs
     x1 = G.Edges.x1;

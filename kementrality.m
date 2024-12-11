@@ -61,10 +61,15 @@ if not(exist('filtered', 'var')) || isempty(filtered)
     filtered = true;
 end
 
-if isa(basename, "string")
+if isa(basename, "char")
     G = convert_graphs(basename, true);
 else
     G = basename;
+end
+
+if exist('weights', 'var') && strcmp(weights, 'inv')
+    G.Edges.Length = hypot(diff(G.Nodes.x(G.Edges.EndNodes)'), diff(G.Nodes.y(G.Edges.EndNodes)'))';
+    weights = 1 ./ G.Edges.Length;
 end
 
 if not(exist('weights', 'var')) || isempty(weights)
@@ -80,7 +85,7 @@ end
 
 G.Edges.kementrality = kementrality;
 
-if isa(basename, "string")
+if isa(basename, "char")
     % creates a reduced Edges table that undoes the switching in
     % convert_graphs
     x1 = G.Edges.x1;
