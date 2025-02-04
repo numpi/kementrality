@@ -1,7 +1,7 @@
-function G = kementrality(basename, reg, weights, filtered, parallel)
+function G = kementrality(basename, weights, reg, parallel)
 % compute kemeny-based centrality from a csv file
 %
-% G = kementrality(basename, reg, weights, filtered, parallel)
+% G = kementrality(basename, weights, reg, parallel)
 %
 % Compute the Kemeny-based centrality described in 
 % https://doi.org/10.1137/22M1486728
@@ -32,33 +32,30 @@ function G = kementrality(basename, reg, weights, filtered, parallel)
 % Alternatively, the first argument can be a Matlab graph object.
 %
 % Additional parameters:
+%   * weights: weight to use for each edge; defaults to 
+%     exp(edge_length/max_length), as used in the paper.
+%     weights='inv' gives a new choice (1/length) that seems to work better.
 %   * reg: regularization parameter as described in the paper; defaults 
 %     to 10^(-8).
-%   * weights: weight to use for each edge; defaults to 
-%     exp(edge_length/max_length), as used in the paper
-%   * filtered: wheter to apply filtering; defaults to true.
 %   * parallel: whether to use parallel computation. You may set it to false
 %     if you don't have the Matlab parallel toolbox installed, or if you want
 %     a faster result for a small network. Otherwise just use the default
 %     true.
 %   
 % To set parallel to false without touching the other defaults, use
-% >> G = kementrality("map", [], [], [], false);
+% >> G = kementrality("map", [], [], false);
 %
 % Return value: a Matlab graph object, which includes G.Edges.kementrality.
 %
 % To plot the map inside Matlab, you can use
 %
-% >> plot(G, "XData", G.Nodes.x, "YData", G.Nodes.y, "EdgeCData", G.Edges.kementrality);
+% plotmeasure(G, kementrality);
 
 if not(exist('reg', 'var')) || isempty(reg)
     reg = 1e-8;
 end
 if not(exist('parallel', 'var')) || isempty(parallel)
     parallel = true;
-end
-if not(exist('filtered', 'var')) || isempty(filtered)
-    filtered = true;
 end
 
 if isa(basename, "char")
@@ -77,11 +74,7 @@ if not(exist('weights', 'var')) || isempty(weights)
     weights = exp(-G.Edges.Length/max(G.Edges.Length));
 end
 
-kementrality = kementrality_chol(G, reg, weights, parallel);
-
-if filtered
-    kementrality(kementrality > 0.5/reg) = 1/reg - kementrality(kementrality > 0.5/reg);
-end
+kementrality = kemchol(G, reg, weights, parallel);
 
 G.Edges.kementrality = kementrality;
 

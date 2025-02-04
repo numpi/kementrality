@@ -1,7 +1,7 @@
-function G = kementrality_der(basename, reg, weights, relative, parallel)
+function G = kementrality_der(basename, weights, relative, parallel)
 % compute the derivative variant of the kemeny-based centrality from a csv file
 %
-% G = kementrality_der(basename, reg, weights, relative, parallel)
+% G = kementrality_der(basename, weights, relative, parallel)
 %
 % Compute the Kemeny-based centrality described in 
 % https://doi.org/10.1137/22M1486728
@@ -14,7 +14,7 @@ function G = kementrality_der(basename, reg, weights, relative, parallel)
 %
 % or:
 %
-% >> G = kementrality_der("map", [], [], false)
+% >> G = kementrality_der("map", [], false)
 %
 % (the second form does not scale the measure by edge weight)
 %
@@ -38,10 +38,9 @@ function G = kementrality_der(basename, reg, weights, relative, parallel)
 % Alternatively, the first argument can be a Matlab graph object.
 %
 % Additional parameters:
-%   * reg: regularization parameter as described in the paper; defaults 
-%     to 10^(-8).
 %   * weights: weight to use for each edge; defaults to 
-%     exp(edge_length/max_length), as used in the paper
+%     exp(edge_length/max_length), as used in the paper.
+%     weights='inv' gives a new choice (1/length) that seems to work better.
 %   * relative: wheter to scale with edge weight; defaults to true.
 %   * parallel: whether to use parallel computation. You may set it to false
 %     if you don't have the Matlab parallel toolbox installed, or if you want
@@ -49,17 +48,14 @@ function G = kementrality_der(basename, reg, weights, relative, parallel)
 %     true.
 %   
 % To set parallel to false without touching the other defaults, use
-% >> G = kementrality("map", [], [], [], false);
+% >> G = kementrality("map", [], [], false);
 %
 % Return value: a Matlab graph object, which includes G.Edges.kementrality.
 %
 % To plot the map inside Matlab, you can use
 %
-% >> plot(G, "XData", G.Nodes.x, "YData", G.Nodes.y, "EdgeCData", G.Edges.kementrality);
+% plotmeasure(G, kementrality_der);
 
-if not(exist('reg', 'var')) || isempty(reg)
-    reg = 1e-8;
-end
 if not(exist('parallel', 'var')) || isempty(parallel)
     parallel = true;
 end
@@ -83,7 +79,7 @@ if not(exist('weights', 'var')) || isempty(weights)
 end
 
 
-kementrality_der = kementrality_chol_der(G, reg, weights, parallel, relative);
+kementrality_der = kderivative(G, weights, parallel, relative);
 
 G.Edges.kementrality_der = kementrality_der;
 
