@@ -38,9 +38,11 @@ function G = kementrality_der(basename, weights, relative, parallel)
 % Alternatively, the first argument can be a Matlab graph object.
 %
 % Additional parameters:
-%   * weights: weight to use for each edge; defaults to 
-%     exp(edge_length/max_length), as used in the paper.
-%     weights='inv' gives a new choice (1/length) that seems to work better.
+%   * weights: weight to use for each edge; it can be:
+%     - a vector with the edges ordered as in G.Edges, 
+%     - 'inv' (default), which is (1/length), where the (Euclidean) length
+%       is computed from G.Nodes.x and G.Nodes.y
+%     - 'exp', i.e., exp(edge_length/max_length), as used in our first papers.
 %   * relative: wheter to scale with edge weight; defaults to true.
 %   * parallel: whether to use parallel computation. You may set it to false
 %     if you don't have the Matlab parallel toolbox installed, or if you want
@@ -68,14 +70,15 @@ if isa(basename, "char")
 else
     G = basename;
 end
-if exist('weights', 'var') && strcmp(weights, 'inv')
-    G.Edges.Length = hypot(diff(G.Nodes.x(G.Edges.EndNodes)'), diff(G.Nodes.y(G.Edges.EndNodes)'))';
-    weights = 1 ./ G.Edges.Length;
-end
 
-if not(exist('weights', 'var')) || isempty(weights)
+if exist('weights', 'var') && strcmp(weights, 'exp')
     G.Edges.Length = hypot(diff(G.Nodes.x(G.Edges.EndNodes)'), diff(G.Nodes.y(G.Edges.EndNodes)'))';
     weights = exp(-G.Edges.Length/max(G.Edges.Length));
+end
+
+if not(exist('weights', 'var')) || isempty(weights) || strcmp(weights, 'inv')
+    G.Edges.Length = hypot(diff(G.Nodes.x(G.Edges.EndNodes)'), diff(G.Nodes.y(G.Edges.EndNodes)'))';
+    weights = 1 ./ G.Edges.Length;
 end
 
 
