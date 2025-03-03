@@ -58,6 +58,7 @@ tic
 [L, D, p] = ldl(M11, 'vector');
 fprintf('Done\n');
 toc
+clear M11;
 % computed solves M11^{-1}(b)
 function b = inv_M11(b)
     b(p,:) = L'\(D\(L\(b(p,:))));
@@ -79,6 +80,9 @@ end
 solve_via_chol_handle = @(b) solve_via_chol(b);
 
 M = G.Edges.EndNodes';
+Pi = Pt(:, M(1,:)); % we perform this access sequentially, so Pt is not a broadcast variable in the parallel loop
+Pj = Pt(:, M(2,:));
+clear Pt;
 
 if parallel
     maxWorkers = inf;
@@ -105,7 +109,8 @@ parfor (k = 1:size(M,2), maxWorkers)
     U = zeros(n, 2);
     U(ij(1), 1) = 1;
     U(ij(2), 2) = 1;
-    Pij = full(Pt(:,ij)');
+    Pij = full([Pi(:,k),Pj(:,k)]');
+
     newrows = Pij;
     newrows(1, ij(2)) = 0;
     newrows(2, ij(1)) = 0;
